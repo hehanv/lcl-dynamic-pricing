@@ -555,6 +555,30 @@ function runAnalysis(){
     .then(function(){ b.disabled = false; b.textContent = "다시 분석"; });
 }
 
+/* ---------- 공식 참고 지표 (검증된 링크만) ---------- */
+var REFS = [
+  { org:"한국해양진흥공사", name:"KCCI 컨테이너선 운임지수",
+    url:"https://www.kobc.or.kr/ebz/shippinginfo/kcci/gridList.do?mId=0304000000",
+    note:"부산항 선적 기준 13개 항로 종합지수 · 매주 월요일 14시 발표",
+    map:"구간운임 r_S 기준선" },
+  { org:"한국해양진흥공사", name:"KDCI 건화물선 운임지수",
+    url:"https://www.kobc.or.kr/ebz/shippinginfo/kdci/gridList.do?mId=0301000000",
+    note:"건화물선 시황 · 해운 전반의 경기 국면 참고",
+    map:"시장 국면 판단 보조" },
+  { org:"한국해양진흥공사", name:"해양정보서비스",
+    url:"https://www.kobc.or.kr/ebz/kor/main.do",
+    note:"주간통합 보고서 · 분기 항만물류 보고서 · 시장분석 보고서",
+    map:"시장 국면 판단 보조" },
+  { org:"국가물류통합정보센터", name:"해운화물통계 · 항만별 물동량",
+    url:"https://www.nlic.go.kr/nlic/transInPortCt.action",
+    note:"같은 메뉴에서 선박입출항 통계와 해상운임지수도 조회 가능",
+    map:"수요 국면 · 시즌 · 선복 공급" },
+  { org:"공공데이터포털", name:"KCCI 지수 원본 데이터셋",
+    url:"https://www.data.go.kr/data/15131881/fileData.do",
+    note:"운임공표제 자료 25% · 패널리스트 실계약 운임 75% 가중 산출",
+    map:"구간운임 r_S 기준선" }
+];
+
 /* ---------- 시황 → 견적 조건 반영 ---------- */
 var PRESETS = {
   peak: { name:"성수기 국면", tone:"up",
@@ -639,16 +663,12 @@ function drawMarket(m){
   } else {
     h += '<div class="banner">'+(m.reason||"브리핑을 사용할 수 없음")+'</div>';
   }
-  if(m.references && m.references.length){
-    h += '<h3 style="font-size:13.5px;margin:20px 0 9px;color:var(--muted);letter-spacing:.07em">공식 참고 지표</h3><div class="reflist">'+
-      m.references.map(function(r){
-        var b = refBadge(r.name);
-        return '<a class="ref" href="'+r.url+'" target="_blank" rel="noopener"><div class="org">'+r.org+
-          '</div><div class="nm">'+r.name+'</div><div class="nt">'+(r.note||"")+'</div>'+
-          (b ? '<div class="mono" style="font-size:11px;color:var(--stamp);margin-top:6px">반영 대상 · '+b+'</div>' : '')+
-          '</a>';
-      }).join("")+'</div>';
-  }
+  h += '<h3 style="font-size:13.5px;margin:20px 0 9px;color:var(--muted);letter-spacing:.07em">공식 참고 지표</h3><div class="reflist">'+
+    REFS.map(function(r){
+      return '<a class="ref" href="'+r.url+'" target="_blank" rel="noopener"><div class="org">'+r.org+
+        '</div><div class="nm">'+r.name+'</div><div class="nt">'+r.note+'</div>'+
+        '<div class="mono" style="font-size:11px;color:var(--stamp);margin-top:6px">반영 대상 · '+r.map+'</div></a>';
+    }).join("")+'</div>';
   if(m.generated_at) h += '<p class="disclaim">Gemini + Google 검색 기반 자동 생성 · '+m.generated_at+' 기준'+
     (m.cached?" (저장된 결과)":"")+'</p>';
   $("market").innerHTML = h;
