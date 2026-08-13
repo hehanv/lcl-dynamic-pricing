@@ -241,14 +241,25 @@ li{margin:5px 0}a{color:#2b5cd9}</style></head><body>
 <h1>LCL 유연상품 추천운임 API</h1>
 <p class="sub">강화학습 기반 할인정책 조회 &middot; 백엔드 서버</p>
 <p>여기는 API 서버입니다. 사용자 화면은 아래에서 확인하세요.</p>
-<p>&rarr; <a href="https://lcl-ocean-freight-dynamic-pricing.ai.studio">서비스 바로가기</a></p>
+<p>&rarr; <a href="/app">서비스 바로가기</a></p>
 <h3>엔드포인트</h3><ul>
+<li><code>GET /app</code> 사용자 화면</li>
 <li><code>GET /meta</code> 정책 축 &middot; 시즌 &middot; 기본값</li>
 <li><code>POST /quote</code> 표준 / 유연 운임 산출</li>
 <li><code>POST /sensitivity</code> 민감도 5종</li>
 <li><code>POST /ratecard</code> 시점 &times; 잔여용적 요율표</li>
 <li><code>GET /market</code> 시황 브리핑</li></ul>
 <p>문서: <a href="/docs">/docs</a></p></body></html>"""
+
+
+@app.get('/app', response_class=HTMLResponse)
+def web_app():
+    """사용자 화면. 서버가 직접 서빙하므로 CORS·별도 배포가 필요 없습니다."""
+    p = os.path.join(HERE, 'static', 'app.html')
+    if not os.path.exists(p):
+        raise HTTPException(404, 'static/app.html 이 없습니다.')
+    with open(p, encoding='utf-8') as fh:
+        return fh.read()
 
 
 @app.get('/meta')
